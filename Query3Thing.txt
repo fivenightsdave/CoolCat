@@ -1,0 +1,92 @@
+DROP TABLE BookingsFreight
+DROP TABLE BookingsPerson
+DROP TABLE Flight
+DROP TABLE PersonnelMovement
+DROP TABLE Personnel
+
+CREATE TABLE Personnel (
+	[PersonnelId] int IDENTITY(1,1),
+
+	[Title] nvarchar(6) NULL,
+	[Forenames] nvarchar(40) NULL,
+	[Surname] nvarchar(30) NULL,
+	[JobTitle] nvarchar(80) NULL,
+	[Sex] nvarchar(2) NULL,
+	[PaxWeight] decimal(6, 1) NULL,
+	[ShoulderWidth] decimal(5, 2) NULL,
+	[XBR] nvarchar(1) NULL,
+
+	CONSTRAINT [PK_Personnel] PRIMARY KEY ([PersonnelId])
+)
+
+CREATE TABLE [PersonnelMovement] (
+	[PersonnelMovementId] int IDENTITY(1, 1),
+
+	[PersonnelId] int NOT NULL,
+	[MovementTimeGmt] DATE NOT NULL,
+	[ArrivalOrDeparture] bit NOT NULL,
+	[Location] nvarchar(4),
+	[FlightNumber] int NOT NULL,
+	[BOokingNUmber] int NOT NULL,
+
+	CONSTRAINT [PK_PersonnelMovement] PRIMARY KEY ([PersonnelMovementId]),
+	CONSTRAINT [FK_PersonnelMovement_Personnel] FOREIGN KEY ([PersonnelId]) REFERENCES [Personnel]
+);
+
+CREATE TABLE [Flight] (
+	[FlightNumber] int IDENTITY(1,1),
+
+	[FlightName] nvarchar(12) NOT NULL,
+	[FlightDate] DATE NOT NULL,
+	[ScheduledDate] DATE NOT NULL,
+	[ScheduledArrival] DATE NOT NULL,
+	[ActualDeparture] DATE NOT NULL,
+	[ActualArrival] DATE NOT NULL,
+	[FlyingTime] int NOT NULL,
+	[FlightStatus] nvarchar(1) NOT NULL,
+	[AircraftType] nvarchar(12) NOT NULL,
+	[AvailableSeatsOutbound] int NOT NULL,
+	[AvailablePayloadOutbound] decimal(6,1) NOT NULL,
+	[AvailableSeatsInbound] int NOT NULL,
+	[AvailablePayloadInbound] decimal(6,1) NOT NULL,
+	[XBRSeats] int NOT NULL,
+
+	CONSTRAINT [PK_Flight] PRIMARY KEY ([FlightNumber])
+);
+
+CREATE TABLE [BookingsPerson] (
+	[BookingNumber] int IDENTITY(1,1),
+
+	[BookingDate] DATE NOT NULL,
+	[BookingStatus] varchar(1) NOT NULL,
+	[FlightNumber] int NOT NULL,
+	[TravelDirection] nvarchar(2) NOT NULL,
+	[PersonnelId] int NOT NULL,
+	[Forenames] nvarchar(40) NOT NULL,
+	[Surname] nvarchar(30) NOT NULL,
+	[DepartureLocation] nvarchar(4) NOT NULL,
+	[DestinationLocation] nvarchar(4) NOT NULL,
+	[BaggagePieces] int NOT NULL,
+	[BaggageWeight] decimal(6, 1) NOT NULL,
+
+	CONSTRAINT [PK_BookingsPerson] PRIMARY KEY ([BookingNumber]),
+	CONSTRAINT [FK_BookingsPerson_Flight] FOREIGN KEY ([FlightNumber]) REFERENCES [Flight],
+	CONSTRAINT [FK_BookingsPerson_Personnel] FOREIGN KEY ([PersonnelId]) REFERENCES [Personnel]
+);
+
+CREATE TABLE [BookingsFreight] (
+	[BookingNumber] int IDENTITY(1,1),
+
+	[BookingDate] DATE NOT NULL,
+	[BookingStatus] nvarchar(1) NOT NULL,
+	[FlightNumber] int NOT NULL,
+	[TravelDirection] varchar(2) NOT NULL,
+	[FreightId] nvarchar(16) NOT NULL,
+	[ItemDescription] nvarchar(80) NOT NULL,
+	[ItemQuantity] int NOT NULL,
+	[DepartureLocation] nvarchar(4) NOT NULL,
+	[DestinationLocation] nvarchar(4) NOT NULL,
+
+	CONSTRAINT [PK_BookingsFreight] PRIMARY KEY ([BookingNumber]),
+	CONSTRAINT [FK_BookingsFreight_Flight] FOREIGN KEY ([FlightNumber]) REFERENCES [Flight]
+)
